@@ -57,7 +57,9 @@ public class ProfessorRepository {
 
 		Connection connection = ConnectionFactory.getConnection();
 
-		PreparedStatement statement = connection.prepareStatement("select * from professor order by nome");
+		PreparedStatement statement = connection.prepareStatement(
+				"SELECT p.id, p.nome, p.telefone, m.id as matricula_id, m.descricao as matricula_descricao "
+						+ "FROM professor p " + "LEFT JOIN matricula m ON p.matricula_id = m.id " + "WHERE p.id = ?");
 
 		ResultSet resultSet = statement.executeQuery();
 
@@ -76,5 +78,30 @@ public class ProfessorRepository {
 
 		connection.close();
 		return lista;
+	}
+
+	public Professor findById(UUID id) throws Exception {
+
+		Connection connection = ConnectionFactory.getConnection();
+
+		PreparedStatement preparedStatement = connection.prepareStatement(
+				"SELECT p.id, p.nome, p.telefone, m.id as matricula_id, m.descricao as matricula_descricao "
+						+ "FROM professor p " + "LEFT JOIN matricula m ON p.matricula_id = m.id " + "WHERE p.id = ?");
+		preparedStatement.setObject(1, id);
+
+		ResultSet resultSet = preparedStatement.executeQuery();
+
+		Professor professor = null;
+
+		if (resultSet.next()) {
+			professor = new Professor();
+
+			professor.setId(UUID.fromString(resultSet.getString("id")));
+			professor.setNome(resultSet.getString("nome"));
+			professor.setTelefone(resultSet.getString("telefone"));
+		}
+
+		connection.close();
+		return professor;
 	}
 }

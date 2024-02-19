@@ -35,10 +35,10 @@ public class AlunoRepository {
 		PreparedStatement statement = connection
 				.prepareStatement("update aluno set nome=?, matricula=?, cpf=? where id=?");
 
-		statement.setObject(1, aluno.getId());
-		statement.setString(2, aluno.getNome());
-		statement.setString(3, aluno.getMatricula());
-		statement.setString(4, aluno.getCpf());
+		statement.setString(1, aluno.getNome());
+		statement.setString(2, aluno.getMatricula());
+		statement.setString(3, aluno.getCpf());
+		statement.setObject(4, aluno.getId());
 		statement.execute();
 
 		connection.close();
@@ -56,30 +56,68 @@ public class AlunoRepository {
 		connection.close();
 	}
 
-	public List<Aluno> findAll() throws Exception {
-			
-			Connection connection = ConnectionFactory.getConnection();
-			
-			PreparedStatement statement = connection.prepareStatement
-					("select * from aluno order by nome");
+	// método para retornar todos os alunos cadastrados no banco de dados
+	// TRABALHA COM MUITOS = LISTA DE ALUNOS
 
-			ResultSet resultSet = statement.executeQuery();
+	public List<Aluno> findAll() throws Exception {
+
+		Connection connection = ConnectionFactory.getConnection();
+
+		PreparedStatement statement = connection
+				.prepareStatement("select a.id, a.nome, a.matricula, a.cpf, t.id as turma_id, t.nome as turma_nome"
+						+ "FROM aluno a" + "LEFT JOIN Turma t ON a.turma_id = t.getId()" + "WHERE a.id = ?");
+
+		ResultSet resultSet = statement.executeQuery();
+
+		List<Aluno> lista = new ArrayList<Aluno>();
+
+		while (resultSet.next()) {
+
+			Aluno aluno = new Aluno();
+
+			aluno.setId(UUID.fromString(resultSet.getString("id")));
+			aluno.setNome(resultSet.getString("nome"));
+			aluno.setMatricula(resultSet.getString("matricula"));
+			aluno.setCpf(resultSet.getString("cpf"));
 			
-			List<Aluno> lista = new ArrayList<Aluno>();
-			
-			while(resultSet.next()) {
-				
-				Aluno aluno = new Aluno();
-								
-				aluno.setId(UUID.fromString(resultSet.getString("id")));
-				aluno.setNome(resultSet.getString("nome"));
-				aluno.setMatricula(resultSet.getString("matricula"));
-				aluno.setCpf(resultSet.getString("cpf"));
-				
-				lista.add(aluno);
-			}
-			
-			connection.close();
-			return lista;
+			lista.add(aluno);
 		}
+
+		connection.close();
+		return lista;
+	}
+
+	public Aluno findById(UUID id) throws Exception {
+
+		// abrindo conexão com o banco de dados
+		Connection connection = ConnectionFactory.getConnection();
+
+		// de dados para consultar 1 aluno através do ID
+		PreparedStatement statement = connection
+				.prepareStatement("select a.id, a.nome, a.matricula, a.cpf, t.id as turma_id, t.nome as turma_nome"
+						+ "FROM aluno a" + "LEFT JOIN Turma t ON a.turma_id = t.getId()" + "WHERE a.id = ?");
+		statement.setObject(1, id);
+
+		// ler e armazenar os registros obtidos do banco de dados
+		ResultSet resultSet = statement.executeQuery();
+
+		// criando um objeto Aluno vazio
+		Aluno aluno = null;
+
+		// verificando se algum aluno foi encontrado no banco de dados
+		if (resultSet.next()) {
+			aluno = new Aluno();
+
+			aluno.setId(UUID.fromString(resultSet.getString("id")));
+			aluno.setNome(resultSet.getString("nome"));
+			aluno.setMatricula(resultSet.getString("matricula"));
+			aluno.setCpf(resultSet.getString("cpf"));
+		}
+
+		// fechando a conexão com o banco de dados
+		connection.close();
+
+		// retornando o aluno
+		return aluno;
+	}
 }

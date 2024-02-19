@@ -22,8 +22,8 @@ public class TurmaRepository {
 
 		statement.setObject(1, turma.getId());
 		statement.setString(2, turma.getNome());
-		statement.setDate(3, new java.sql.Date(turma.getDataInicio().getTime()));
-		statement.setDate(4, new java.sql.Date(turma.getDataTermino().getTime()));
+		statement.setDate(3, java.sql.Date.valueOf(turma.getDataInicio()));
+		statement.setDate(4, java.sql.Date.valueOf(turma.getDataTermino()));
 		statement.execute();
 
 		statement.close();
@@ -37,8 +37,8 @@ public class TurmaRepository {
 				.prepareStatement("update turma set nome=?, dataInicio=?, dataTermino=? where id=?");
 
 		statement.setString(1, turma.getNome());
-		statement.setDate(2, new java.sql.Date(turma.getDataInicio().getTime()));
-		statement.setDate(3, new java.sql.Date(turma.getDataTermino().getTime()));
+		statement.setDate(2, java.sql.Date.valueOf(turma.getDataInicio()));
+		statement.setDate(3, java.sql.Date.valueOf(turma.getDataTermino()));
 		statement.setObject(4, turma.getId());
 		statement.execute();
 
@@ -49,7 +49,9 @@ public class TurmaRepository {
 
 		Connection connection = ConnectionFactory.getConnection();
 
-		PreparedStatement statement = connection.prepareStatement("delete from turma where id=?");
+		PreparedStatement statement = connection.prepareStatement(
+				"SELECT t.id, t.nome, t.data_inicio, t.data_termino, m.id as matricula_id, m.descricao as matricula_descricao "
+						+ "FROM turma t " + "LEFT JOIN matricula m ON t.matricula_id = m.id " + "WHERE t.id = ?");
 
 		statement.setObject(1, turma.getId());
 		statement.execute();
@@ -61,7 +63,9 @@ public class TurmaRepository {
 
 		Connection connection = ConnectionFactory.getConnection();
 
-		PreparedStatement statement = connection.prepareStatement("select * from turma order by nome");
+		PreparedStatement statement = connection.prepareStatement(
+				"SELECT t.id, t.nome, t.data_inicio, t.data_termino, m.id as matricula_id, m.descricao as matricula_descricao "
+						+ "FROM turma t " + "LEFT JOIN matricula m ON t.matricula_id = m.id " + "WHERE t.id = ?");
 
 		ResultSet resultSet = statement.executeQuery();
 
@@ -80,5 +84,29 @@ public class TurmaRepository {
 
 		connection.close();
 		return lista;
+	}
+
+	public Turma findById(UUID id) throws Exception {
+
+		Connection connection = ConnectionFactory.getConnection();
+
+		PreparedStatement preparedStatement = connection.prepareStatement("select * from turma where id=?");
+		preparedStatement.setObject(1, id);
+
+		ResultSet resultSet = preparedStatement.executeQuery();
+
+		Turma turma = null;
+
+		if (resultSet.next()) {
+			turma = new Turma();
+
+			turma.setId(UUID.fromString(resultSet.getString("id")));
+			turma.setNome(resultSet.getString("nome"));
+			turma.setDataInicio(LocalDate.parse(resultSet.getString("dataInicio")));
+			turma.setDataTermino(LocalDate.parse(resultSet.getString("dataTermino")));
+		}
+
+		connection.close();
+		return turma;
 	}
 }
