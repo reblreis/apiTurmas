@@ -3,11 +3,12 @@ package br.com.reginareis.repositories;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.time.LocalDate;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import br.com.reginareis.entities.Professor;
 import br.com.reginareis.entities.Turma;
 import br.com.reginareis.factories.ConnectionFactory;
 
@@ -17,13 +18,14 @@ public class TurmaRepository {
 
 		Connection connection = ConnectionFactory.getConnection();
 
-		PreparedStatement statement = connection
-				.prepareStatement("insert into turma(id, nome, dataInicio, dataTermino) values(?,?,?,?)");
+		PreparedStatement statement = connection.prepareStatement(
+				"INSERT INTO turma(id_turma, nome_turma, data_inicio, data_termino, professor_id) values(?,?,?,?,?)");
 
-		statement.setObject(1, turma.getId());
-		statement.setString(2, turma.getNome());
-		statement.setDate(3, java.sql.Date.valueOf(turma.getDataInicio()));
-		statement.setDate(4, java.sql.Date.valueOf(turma.getDataTermino()));
+		statement.setObject(1, turma.getId_turma());
+		statement.setString(2, turma.getNome_turma());
+		statement.setDate(3, new java.sql.Date(turma.getData_inicio().getTime()));
+		statement.setDate(4, new java.sql.Date(turma.getData_termino().getTime()));
+		statement.setObject(5, turma.getProfessor().getId_professor());
 		statement.execute();
 
 		statement.close();
@@ -33,13 +35,14 @@ public class TurmaRepository {
 
 		Connection connection = ConnectionFactory.getConnection();
 
-		PreparedStatement statement = connection
-				.prepareStatement("update turma set nome=?, dataInicio=?, dataTermino=? where id=?");
+		PreparedStatement statement = connection.prepareStatement(
+				"UPDATE turma SET nome_turma=?, data_inicio=?, data_termino=?, professor_id=? where id_turma=?");
 
-		statement.setString(1, turma.getNome());
-		statement.setDate(2, java.sql.Date.valueOf(turma.getDataInicio()));
-		statement.setDate(3, java.sql.Date.valueOf(turma.getDataTermino()));
-		statement.setObject(4, turma.getId());
+		statement.setString(1, turma.getNome_turma());
+		statement.setDate(2, new java.sql.Date(turma.getData_inicio().getTime()));
+		statement.setDate(3, new java.sql.Date(turma.getData_termino().getTime()));
+		statement.setObject(4, turma.getProfessor().getId_professor());
+		statement.setObject(5, turma.getId_turma());
 		statement.execute();
 
 		connection.close();
@@ -49,11 +52,9 @@ public class TurmaRepository {
 
 		Connection connection = ConnectionFactory.getConnection();
 
-		PreparedStatement statement = connection.prepareStatement(
-				"SELECT t.id, t.nome, t.data_inicio, t.data_termino, m.id as matricula_id, m.descricao as matricula_descricao "
-						+ "FROM turma t " + "LEFT JOIN matricula m ON t.matricula_id = m.id " + "WHERE t.id = ?");
+		PreparedStatement statement = connection.prepareStatement("DELETE FROM turma WHERE id_turma=?");
 
-		statement.setObject(1, turma.getId());
+		statement.setObject(1, turma.getId_turma());
 		statement.execute();
 
 		connection.close();
@@ -63,47 +64,53 @@ public class TurmaRepository {
 
 		Connection connection = ConnectionFactory.getConnection();
 
-		PreparedStatement statement = connection.prepareStatement(
-				"SELECT t.id, t.nome, t.data_inicio, t.data_termino, m.id as matricula_id, m.descricao as matricula_descricao "
-						+ "FROM turma t " + "LEFT JOIN matricula m ON t.matricula_id = m.id " + "WHERE t.id = ?");
+		PreparedStatement statement = connection.prepareStatement("SELECT * FROM turma ORDER BY nome_turma");
 
 		ResultSet resultSet = statement.executeQuery();
 
-		List<Turma> lista = new ArrayList<Turma>();
+		List<Turma> turmas = new ArrayList<Turma>();
 
 		while (resultSet.next()) {
 
 			Turma turma = new Turma();
+			turma.setProfessor(new Professor());
 
-			turma.setId(UUID.fromString(resultSet.getString("id")));
-			turma.setNome(resultSet.getString("nome"));
-			turma.setDataInicio(LocalDate.parse(resultSet.getString("dataInicio")));
-			turma.setDataTermino(LocalDate.parse(resultSet.getString("dataTermino")));
-			lista.add(turma);
+			turma.setId_turma(UUID.fromString(resultSet.getString("id_turma")));
+			turma.setNome_turma(resultSet.getString("nome_turma"));
+			turma.setData_inicio(new java.sql.Date(
+					new SimpleDateFormat("yyyy-MM-dd").parse(resultSet.getString("data_inicio")).getTime()));
+			turma.setData_termino(new java.sql.Date(
+					new SimpleDateFormat("yyyy-MM-dd").parse(resultSet.getString("data_termino")).getTime()));
+
+			turma.getProfessor().setId_professor(UUID.fromString(resultSet.getString("professor_id")));
+			turmas.add(turma);
 		}
 
 		connection.close();
-		return lista;
+		return turmas;
 	}
 
 	public Turma findById(UUID id) throws Exception {
 
 		Connection connection = ConnectionFactory.getConnection();
-
-		PreparedStatement preparedStatement = connection.prepareStatement("select * from turma where id=?");
+		PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM turma WHERE id_turma=?");
 		preparedStatement.setObject(1, id);
-
 		ResultSet resultSet = preparedStatement.executeQuery();
 
 		Turma turma = null;
 
 		if (resultSet.next()) {
 			turma = new Turma();
+			turma.setProfessor(new Professor());
 
-			turma.setId(UUID.fromString(resultSet.getString("id")));
-			turma.setNome(resultSet.getString("nome"));
-			turma.setDataInicio(LocalDate.parse(resultSet.getString("dataInicio")));
-			turma.setDataTermino(LocalDate.parse(resultSet.getString("dataTermino")));
+			turma.setId_turma(UUID.fromString(resultSet.getString("id_turma")));
+			turma.setNome_turma(resultSet.getString("nome_turma"));
+			turma.setData_inicio(new java.sql.Date(
+					new SimpleDateFormat("yyyy-MM-dd").parse(resultSet.getString("data_inicio")).getTime()));
+			turma.setData_termino(new java.sql.Date(
+					new SimpleDateFormat("yyyy-MM-dd").parse(resultSet.getString("data_termino")).getTime()));
+			turma.getProfessor().setId_professor(UUID.fromString(resultSet.getString("professor_id")));
+
 		}
 
 		connection.close();

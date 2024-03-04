@@ -29,7 +29,7 @@ public class AlunoController {
 		try {
 			Aluno aluno = new Aluno();
 
-			aluno.setId(UUID.randomUUID());
+			aluno.setId_aluno(UUID.randomUUID());
 			aluno.setNome(dto.getNome());
 			aluno.setMatricula(dto.getMatricula());
 			aluno.setCpf(dto.getCpf());
@@ -56,11 +56,9 @@ public class AlunoController {
 			if (aluno == null)
 				return ResponseEntity.status(400).body("Aluno(a) não encontrado(a). Verifique o ID informado.");
 
-			aluno.setId(UUID.randomUUID());
 			aluno.setNome(dto.getNome());
 			aluno.setMatricula(dto.getMatricula());
 			aluno.setCpf(dto.getCpf());
-
 			alunoRepository.update(aluno);
 
 			return ResponseEntity.status(200).body("Aluno(a) atualizado(a) com sucesso.");
@@ -100,6 +98,7 @@ public class AlunoController {
 		try {
 			AlunoRepository alunoRepository = new AlunoRepository();
 			List<Aluno> alunos = alunoRepository.findAll();
+			
 			if (alunos.size() == 0) // se a lista está vazia
 				// HTTP 204 - NO CONTENT
 				return ResponseEntity.status(204).body(null);

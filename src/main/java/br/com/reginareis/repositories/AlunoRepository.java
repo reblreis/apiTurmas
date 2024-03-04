@@ -17,9 +17,9 @@ public class AlunoRepository {
 		Connection connection = ConnectionFactory.getConnection();
 
 		PreparedStatement statement = connection
-				.prepareStatement("insert into aluno(id, nome, matricula, cpf) values(?,?,?,?)");
+				.prepareStatement("insert into aluno(id_aluno, nome, matricula, cpf) values(?,?,?,?)");
 
-		statement.setObject(1, aluno.getId());
+		statement.setObject(1, aluno.getId_aluno());
 		statement.setString(2, aluno.getNome());
 		statement.setString(3, aluno.getMatricula());
 		statement.setString(4, aluno.getCpf());
@@ -38,7 +38,7 @@ public class AlunoRepository {
 		statement.setString(1, aluno.getNome());
 		statement.setString(2, aluno.getMatricula());
 		statement.setString(3, aluno.getCpf());
-		statement.setObject(4, aluno.getId());
+		statement.setObject(4, aluno.getId_aluno());
 		statement.execute();
 
 		connection.close();
@@ -50,7 +50,7 @@ public class AlunoRepository {
 
 		PreparedStatement statement = connection.prepareStatement("delete from aluno where id=?");
 
-		statement.setObject(1, aluno.getId());
+		statement.setObject(1, aluno.getId_aluno());
 		statement.execute();
 
 		connection.close();
@@ -63,10 +63,7 @@ public class AlunoRepository {
 
 		Connection connection = ConnectionFactory.getConnection();
 
-		PreparedStatement statement = connection
-				.prepareStatement("select a.id, a.nome, a.matricula, a.cpf, t.id as turma_id, t.nome as turma_nome"
-						+ "FROM aluno a" + "LEFT JOIN Turma t ON a.turma_id = t.getId()" + "WHERE a.id = ?");
-
+		PreparedStatement statement = connection.prepareStatement("select * from aluno order by nome");
 		ResultSet resultSet = statement.executeQuery();
 
 		List<Aluno> lista = new ArrayList<Aluno>();
@@ -75,11 +72,11 @@ public class AlunoRepository {
 
 			Aluno aluno = new Aluno();
 
-			aluno.setId(UUID.fromString(resultSet.getString("id")));
+			aluno.setId_aluno(UUID.fromString(resultSet.getString("id_aluno")));
 			aluno.setNome(resultSet.getString("nome"));
 			aluno.setMatricula(resultSet.getString("matricula"));
 			aluno.setCpf(resultSet.getString("cpf"));
-			
+
 			lista.add(aluno);
 		}
 
@@ -93,9 +90,7 @@ public class AlunoRepository {
 		Connection connection = ConnectionFactory.getConnection();
 
 		// de dados para consultar 1 aluno através do ID
-		PreparedStatement statement = connection
-				.prepareStatement("select a.id, a.nome, a.matricula, a.cpf, t.id as turma_id, t.nome as turma_nome"
-						+ "FROM aluno a" + "LEFT JOIN Turma t ON a.turma_id = t.getId()" + "WHERE a.id = ?");
+		PreparedStatement statement = connection.prepareStatement("select * from aluno where id=?");
 		statement.setObject(1, id);
 
 		// ler e armazenar os registros obtidos do banco de dados
@@ -108,7 +103,7 @@ public class AlunoRepository {
 		if (resultSet.next()) {
 			aluno = new Aluno();
 
-			aluno.setId(UUID.fromString(resultSet.getString("id")));
+			aluno.setId_aluno(UUID.fromString(resultSet.getString("id")));
 			aluno.setNome(resultSet.getString("nome"));
 			aluno.setMatricula(resultSet.getString("matricula"));
 			aluno.setCpf(resultSet.getString("cpf"));

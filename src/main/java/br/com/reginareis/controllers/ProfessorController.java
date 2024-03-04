@@ -29,7 +29,7 @@ public class ProfessorController {
 		try {
 			Professor professor = new Professor();
 
-			professor.setId(UUID.randomUUID());
+			professor.setId_professor(UUID.randomUUID());
 			professor.setNome(dto.getNome());
 			professor.setTelefone(dto.getTelefone());
 
@@ -54,7 +54,6 @@ public class ProfessorController {
 						// HTTP 400 - BAD REQUEST
 						.body("Professor(a) não encontrado(a). Verifique o ID informado.");
 
-			professor.setId(UUID.randomUUID());
 			professor.setNome(dto.getNome());
 			professor.setTelefone(dto.getTelefone());
 

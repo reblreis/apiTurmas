@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.reginareis.dtos.TurmaPostRequestDto;
 import br.com.reginareis.dtos.TurmaPutRequestDto;
+import br.com.reginareis.entities.Professor;
 import br.com.reginareis.entities.Turma;
+import br.com.reginareis.repositories.ProfessorRepository;
 import br.com.reginareis.repositories.TurmaRepository;
 import jakarta.validation.Valid;
 
@@ -29,11 +31,18 @@ public class TurmaController {
 		try {
 			Turma turma = new Turma();
 
-			turma.setId(UUID.randomUUID());
-			turma.setNome(dto.getNome());
-			turma.setDataInicio(dto.getDataInicio());
-			turma.setDataTermino(dto.getDataTermino());
-			turma.setProfessores(dto.getProfessores());
+			turma.setId_turma(UUID.randomUUID());
+			turma.setNome_turma(dto.getNome());
+			turma.setData_inicio(dto.getData_inicio());
+			turma.setData_termino(dto.getData_termino());
+
+			ProfessorRepository professorRepository = new ProfessorRepository();
+			Professor professor = professorRepository.findById(dto.getProfessor_id());
+
+			if (professor == null) {
+				throw new Exception("Professor não encontrado");
+			}
+			turma.setProfessor(professor);
 
 			TurmaRepository turmaRepository = new TurmaRepository();
 			turmaRepository.insert(turma);
@@ -59,11 +68,11 @@ public class TurmaController {
 						// HTTP 400 - BAD REQUEST
 						.body("Turma não encontrada. Verifique o ID informado.");
 
-			turma.setId(UUID.randomUUID());
-			turma.setNome(dto.getNome());
-			turma.setDataInicio(dto.getDataInicio());
-			turma.setDataTermino(dto.getDataTermino());
-			turma.setProfessores(dto.getProfessores());
+			turma.setId_turma(UUID.randomUUID());
+			turma.setNome_turma(dto.getNome());
+			turma.setData_inicio(dto.getData_inicio());
+			turma.setData_termino(dto.getData_termino());
+			turma.setProfessor(dto.getProfessor());
 
 			turmaRepository.update(turma);
 

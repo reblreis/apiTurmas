@@ -17,9 +17,9 @@ public class ProfessorRepository {
 		Connection connection = ConnectionFactory.getConnection();
 
 		PreparedStatement statement = connection
-				.prepareStatement("insert into professor(id, nome, telefone, matricula) values(?,?,?,?)");
+				.prepareStatement("insert into professor(id_professor, nome, telefone) values(?,?,?)");
 
-		statement.setObject(1, professor.getId());
+		statement.setObject(1, professor.getId_professor());
 		statement.setString(2, professor.getNome());
 		statement.setString(3, professor.getTelefone());
 		statement.execute();
@@ -31,11 +31,12 @@ public class ProfessorRepository {
 
 		Connection connection = ConnectionFactory.getConnection();
 
-		PreparedStatement statement = connection.prepareStatement("update professor set nome=?, telefone=? where id=?");
+		PreparedStatement statement = connection
+				.prepareStatement("UPDATE professor set nome=?, telefone=? where id_professor=?");
 
 		statement.setString(1, professor.getNome());
 		statement.setString(2, professor.getTelefone());
-		statement.setObject(3, professor.getId());
+		statement.setObject(3, professor.getId_professor());
 		statement.execute();
 
 		connection.close();
@@ -45,9 +46,9 @@ public class ProfessorRepository {
 
 		Connection connection = ConnectionFactory.getConnection();
 
-		PreparedStatement statement = connection.prepareStatement("delete from professor where id=?");
+		PreparedStatement statement = connection.prepareStatement("DELETE FROM professor where id_professor=?");
 
-		statement.setObject(1, professor.getId());
+		statement.setObject(1, professor.getId_professor());
 		statement.execute();
 
 		connection.close();
@@ -57,9 +58,7 @@ public class ProfessorRepository {
 
 		Connection connection = ConnectionFactory.getConnection();
 
-		PreparedStatement statement = connection.prepareStatement(
-				"SELECT p.id, p.nome, p.telefone, m.id as matricula_id, m.descricao as matricula_descricao "
-						+ "FROM professor p " + "LEFT JOIN matricula m ON p.matricula_id = m.id " + "WHERE p.id = ?");
+		PreparedStatement statement = connection.prepareStatement("SELECT * FROM professor ORDER BY nome");
 
 		ResultSet resultSet = statement.executeQuery();
 
@@ -69,7 +68,7 @@ public class ProfessorRepository {
 
 			Professor professor = new Professor();
 
-			professor.setId(UUID.fromString(resultSet.getString("id")));
+			professor.setId_professor(UUID.fromString(resultSet.getString("id_professor")));
 			professor.setNome(resultSet.getString("nome"));
 			professor.setTelefone(resultSet.getString("telefone"));
 
@@ -84,19 +83,17 @@ public class ProfessorRepository {
 
 		Connection connection = ConnectionFactory.getConnection();
 
-		PreparedStatement preparedStatement = connection.prepareStatement(
-				"SELECT p.id, p.nome, p.telefone, m.id as matricula_id, m.descricao as matricula_descricao "
-						+ "FROM professor p " + "LEFT JOIN matricula m ON p.matricula_id = m.id " + "WHERE p.id = ?");
-		preparedStatement.setObject(1, id);
+		PreparedStatement statement = connection.prepareStatement("select from professor where id_professor = ?");
+		statement.setObject(1, id);
 
-		ResultSet resultSet = preparedStatement.executeQuery();
+		ResultSet resultSet = statement.executeQuery();
 
 		Professor professor = null;
 
 		if (resultSet.next()) {
 			professor = new Professor();
 
-			professor.setId(UUID.fromString(resultSet.getString("id")));
+			professor.setId_professor(UUID.fromString(resultSet.getString("id_professor")));
 			professor.setNome(resultSet.getString("nome"));
 			professor.setTelefone(resultSet.getString("telefone"));
 		}

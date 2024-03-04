@@ -1,29 +1,30 @@
 create table aluno(
-	id				uuid			primary key,
+	id_aluno		uuid			primary key,
 	nome			varchar(150)	not null,
 	matricula		varchar(10)		not null,
 	cpf				varchar(15)		not null
 );
 
 create table professor(
-	id				uuid			primary key,
+	id_professor	uuid			primary key,
 	nome			varchar(150)	not null,
 	telefone		varchar(15)		not null,
-	cpf				varchar(15)		not null
+	matricula_id	uuid	
 );
 
 create table turma(
-	id				uuid			primary key,
+	id_turma		uuid			primary key,
 	nome			varchar(50)		not null,
 	dataInicio		date			not null,
 	dataTermino		date,
 	professor_id	uuid,
 	foreign key(professor_id) 
-		references professor(id)
+		references professor(id),
+	matricula_id	uuid
 );
 
 create table matricula(
-	id				uuid		primary key,
+	id_matricula	uuid		primary key,
 	turma_id		uuid,
 	aluno_id		uuid,
 	dataMatricula	date		not null,

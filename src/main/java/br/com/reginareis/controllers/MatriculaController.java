@@ -30,10 +30,10 @@ public class MatriculaController {
 
 			Matricula matricula = new Matricula();
 
-			matricula.setId(UUID.randomUUID());
+			matricula.setId_matricula(UUID.randomUUID());
 
 			TurmaRepository turmaRepository = new TurmaRepository();
-			Turma turma = turmaRepository.findById(dto.getTurmaId());
+			Turma turma = turmaRepository.findById(dto.getTurma_id());
 
 			if (turma == null)
 				// HTTP 400 - BAD REQUEST
@@ -42,7 +42,7 @@ public class MatriculaController {
 			matricula.setTurma(turma);
 
 			AlunoRepository alunoRepository = new AlunoRepository();
-			Aluno aluno = alunoRepository.findById(dto.getAlunoId());
+			Aluno aluno = alunoRepository.findById(dto.getAluno_id());
 
 			if (aluno == null)
 				// HTTP 400 - BAD REQUEST
@@ -50,7 +50,7 @@ public class MatriculaController {
 
 			matricula.setAluno(aluno);
 
-			matricula.setDataMatricula(dto.getDataMatricula());
+			matricula.setData_matricula(dto.getData_matricula());
 
 			MatriculaRepository matriculaRepository = new MatriculaRepository();
 			matriculaRepository.insert(matricula);
@@ -76,10 +76,10 @@ public class MatriculaController {
 
 			matriculaRepository.delete(matricula);
 
-			//HTTP 200 - OK
+			// HTTP 200 - OK
 			return ResponseEntity.status(200).body("Matricula excluída com sucesso.");
 		} catch (Exception e) {
-			//HTTP 500 - INTERNAL SERVER ERROR
+			// HTTP 500 - INTERNAL SERVER ERROR
 			return ResponseEntity.status(500).body(e.getMessage());
 		}
 	}

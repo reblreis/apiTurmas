@@ -1,7 +1,6 @@
 package br.com.reginareis.dtos;
 
-import java.time.LocalDate;
-import java.util.List;
+import java.sql.Date;
 import java.util.UUID;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -25,14 +24,14 @@ public class TurmaPutRequestDto {
 
 	@NotNull(message = "Por favor, informe a data de início.")
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-	private LocalDate dataInicio;
+	private Date data_inicio;
 
 	@NotNull(message = "Por favor, informe a data de término.")
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-	private LocalDate dataTermino;
+	private Date data_termino;
 
 	@NotEmpty(message = "A lista de professores não pode estar vazia.")
 	@Size(min = 1, max = 10, message = "A lista de professores deve conter entre 1 e 10 professores.")
-	private List<Professor> professores;
+	private Professor professor;
 
 }

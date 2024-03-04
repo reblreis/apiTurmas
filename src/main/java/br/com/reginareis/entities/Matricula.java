@@ -1,6 +1,6 @@
 package br.com.reginareis.entities;
 
-import java.time.LocalDate;
+import java.sql.Date;
 import java.util.UUID;
 
 import lombok.Data;
@@ -8,9 +8,9 @@ import lombok.Data;
 @Data
 public class Matricula {
 
-	private UUID id;
+	private UUID id_matricula;
 	private Turma turma;
 	private Aluno aluno;
-	private LocalDate dataMatricula;
+	private Date data_matricula;
 
 }
